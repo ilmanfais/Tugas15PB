@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisProduk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class JenisProdukController extends Controller
 {
@@ -42,7 +43,30 @@ class JenisProdukController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Digunakan untuk menambahkan data JenisProduk baru
+        $data = [
+            'id' => 'required',
+            'nama' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $data);
+        if ($validator->fails()) {
+            $fails = [
+                "message" => "Gagal Menambahkan Data JenisProduk",
+                "data" => $validator->errors()
+            ];
+            return response()->json($fails, 404);
+        } else {
+            $jpr = new JenisProduk();
+            $jpr->id = $request->id;
+            $jpr->nama = $request->nama;
+            $jpr->save();
+            $success = [
+                "message" => "Data JenisProduk Berhasil",
+                "data" => $jpr
+            ];
+            return response()->json($success, 200);
+        }
     }
 
     /**
@@ -50,7 +74,7 @@ class JenisProdukController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // 
     }
 
     /**
@@ -66,7 +90,37 @@ class JenisProdukController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Digunakan untuk mengupdate data JenisProduk
+        $validator = Validator::make($request->all(), [
+            'id' => 'integer',
+            'nama' => 'string |max:255',
+        ]);
+
+        if ($validator->fails()) {
+            $fails = [
+                'message' => 'Data Tidak Valid',
+                'data' => $validator->errors()
+            ];
+            return response()->json($fails, 400);
+        }
+
+        $jpr = JenisProduk::find($id);
+        if ($jpr) {
+            $jpr->update($request->all());
+            $success = [
+                'success' => true,
+                "message" => "Data JenisProduk Berhasil Diupdate",
+                "data" => $jpr
+            ];
+            return response()->json($success, 200);
+        } else {
+            $fails = [
+                'success' => false,
+                "message" => "Data JenisProduk Tidak Ditemukan",
+                "data" => $jpr
+            ];
+            return response()->json($fails, 404);
+        }
     }
 
     /**

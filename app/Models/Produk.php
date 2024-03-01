@@ -9,7 +9,7 @@ class Produk extends Model
 {
     use HasFactory;
 
-    protected $filelable = [
+    protected $fillable = [
         'id',
         'nama',
         'stok',
